@@ -30,11 +30,9 @@ for (n, (f, e)) in enumerate(bitext):
         sys.stderr.write(".")
 
 p_e_given_f = defaultdict(float)
-e_vocab = len(e_count.keys())
-
-for n, f_i in enumerate(f_count.keys()):
-    p_e_given_f.update({(f, e): 1.0 / (e_vocab + 1) for (f, e) in filter(lambda (x, y): x == f_i, fe_count.keys())})  # NULL?
-    # p_e_given_f.update({(f, e): 1.0 / (m + 1) for (f, e) in marginal})
-    if n % 100 == 0:
+num_e_count = len(e_count.keys())
+for n, (f_i, e_i) in enumerate(fe_count.keys()):
+    p_e_given_f[(f_i, e_i)] = 1.0 / num_e_count
+    if n % 500 == 0:
         sys.stderr.write(".")
     print n
