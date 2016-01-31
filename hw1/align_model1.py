@@ -13,6 +13,7 @@ fe_count = defaultdict(int)
 p_e_given_f = defaultdict(float)
 weighted_counts = defaultdict(float)
 
+
 def read_corpus(opts):
     global bitext, f_count, e_count, fe_count, p_e_given_f
     sys.stderr.write("Training with IBM Model 1...")
@@ -46,7 +47,32 @@ def expectation_sent(f_text, e_text):
         a_i_distribution = [(p_a_given_e * p_e_given_f[(f_i, e_i)]) for f_i in f_text]
         p_ai_given_fe = map(lambda x: x / sum(a_i_distribution), a_i_distribution)
         res.update({(f_j, e_i): p_ai_given_fe[j] for (j, f_j) in enumerate(f_text)})
+    return res
 
+
+def EM():
+    global bitext, p_e_given_f
+    weighted_counts = defaultdict(float)
+    f_vocabularies = set()
+    # E-step, calculating weighted scores
+    for (f_text, e_text) in bitext:
+        res = expectation_sent(f_text, e_text)
+        for ((f, e), score) in res.items():
+            weighted_counts[(f, e)] += score
+            f_vocabularies.add(f)
+    print "E-step is over."
+    print "German Vocabulary size: %d" % len(f_vocabularies)
+    # M-step, updating table
+    for f_i in f_vocabularies:
+        # row = filter(lambda ((x, y), z): x == f_i, weighted_counts.items())   # SLOW
+        row = [((x, y), z) for ((x, y), z) in weighted_counts.items() if x == f_i]
+        denominator = sum([score for ((f, e), score) in row])
+        for ((f, e), score) in row:
+            weighted_counts[(f, e)] = score / denominator
+
+    p_e_given_f = weighted_counts
+    print "M-step is over"
+    print
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
@@ -56,4 +82,4 @@ if __name__ == '__main__':
                          type="int", help="Number of sentences to use for training and alignment")
     (opts, _) = optparser.parse_args()
     read_corpus(opts)
-    expectation_sent(bitext[0][0], bitext[0][1])
+    EM()
