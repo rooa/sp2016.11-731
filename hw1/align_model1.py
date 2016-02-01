@@ -6,7 +6,8 @@ import sys
 from collections import defaultdict
 import numpy as np
 
-bitext = None
+bitext_original = None
+bitext_dev = None
 f_count = defaultdict(int)
 e_count = defaultdict(int)
 fe_count = defaultdict(int)
@@ -15,12 +16,12 @@ weighted_counts = defaultdict(float)
 
 
 def read_corpus(opts):
-    global bitext, f_count, e_count, fe_count, p_e_given_f
+    global bitext_original, bitext_dev, f_count, e_count, fe_count, p_e_given_f
     sys.stderr.write("Training with IBM Model 1...")
-    bitext = [[sentence.strip().split() for sentence in pair.split(' ||| ')]
-              for pair in open(opts.bitext)][:opts.num_sents]
-
-    for (n, (f, e)) in enumerate(bitext):
+    bitext_original = [[sentence.lower().strip().split() for sentence in pair.split(' ||| ')]
+                       for pair in open(opts.bitext)]
+    bitext_dev = bitext_original[:opts.num_sents]
+    for (n, (f, e)) in enumerate(bitext_dev):
         for f_i in set(f):
             f_count[f_i] += 1
             for e_j in set(e):
@@ -50,18 +51,18 @@ def expectation_sent(f_text, e_text):
 
 
 def EM():
-    global bitext, p_e_given_f
+    global bitext_dev, p_e_given_f
     weighted_counts = defaultdict(lambda: defaultdict(float))
     f_vocabularies = set()
     # E-step, calculating weighted scores
-    for (f_text, e_text) in bitext:
+    for (f_text, e_text) in bitext_dev:
         res = expectation_sent(f_text, e_text)
         for ((f, e), score) in res.iteritems():
             weighted_counts[f][e] += score
             f_vocabularies.add(f)
-    print
-    print "E-step is over."
-    print "German Vocabulary size: %d" % len(f_vocabularies)
+
+    sys.stderr.write("E-step is over.\n")
+    sys.stderr.write("German Vocabulary size: %d\n" % len(f_vocabularies))
     # M-step, updating table
     for f_i in f_vocabularies:
         # row = filter(lambda ((x, y), z): x == f_i, weighted_counts.iteritems())   # SLOW
@@ -70,8 +71,25 @@ def EM():
         weighted_counts[f_i] = {k: (v / denominator) for (k, v) in row.iteritems()}
 
     p_e_given_f = weighted_counts
-    print "M-step is over"
-    print
+    sys.stderr.write("M-step is over\n")
+
+
+def align_sent(f_text, e_text):
+    global p_e_given_f
+    res = []
+    for (j, e) in enumerate(e_text):
+        i = np.argmax([p_e_given_f[f][e] for f in f_text])
+        res.append((i, j))
+    return res
+
+
+def align():
+    global bitext_original, p_e_given_f
+    for (f_text, e_text) in bitext_original:
+        res = align_sent(f_text, e_text)
+        sys.stdout.write(" ".join(["-".join([str(i), str(j)]) for (i, j) in res]))
+        sys.stdout.write("\n")
+
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
@@ -84,3 +102,4 @@ if __name__ == '__main__':
     for i in range(5):
         EM()
     print sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5]
+    align()
