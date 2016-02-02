@@ -5,25 +5,32 @@ import optparse
 import sys
 from collections import defaultdict
 import numpy as np
+from nltk.stem.snowball import SnowballStemmer
 
 bitext_original = None
+bitext_stemmed = None
 bitext_dev = None
-f_count = defaultdict(int)
 e_count = defaultdict(int)
 fe_count = defaultdict(int)
 p_e_given_f = defaultdict(lambda: defaultdict(float))
 weighted_counts = defaultdict(float)
 
+deu_stemmer = SnowballStemmer("german", ignore_stopwords=True)
+eng_stemmer = SnowballStemmer("english", ignore_stopwords=True)
+
 
 def read_corpus(opts):
-    global bitext_original, bitext_dev, f_count, e_count, fe_count, p_e_given_f
-    sys.stderr.write("Training with IBM Model 1...")
-    bitext_original = [[sentence.lower().strip().split() for sentence in pair.split(' ||| ')]
-                       for pair in open(opts.bitext)]
-    bitext_dev = bitext_original[:opts.num_sents]
+    global bitext_original, bitext_stemmed, bitext_dev, f_count, e_count, fe_count, p_e_given_f
+    sys.stderr.write("Training with IBM Model 1...\n")
+    bitext_original = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
+                       for pair in open(opts.bitext)][:opts.num_sents]
+    bitext_stemmed = [[[deu_stemmer.stem(i) for i in f],
+                       [eng_stemmer.stem(i) for i in e]]
+                      for (f, e) in bitext_original]
+    sys.stderr.write("Stemming finished.\n")
+    bitext_dev = bitext_stemmed
     for (n, (f, e)) in enumerate(bitext_dev):
         for f_i in set(f):
-            f_count[f_i] += 1
             for e_j in set(e):
                 fe_count[(f_i, e_j)] += 1
         for e_j in set(e):
@@ -84,8 +91,8 @@ def align_sent(f_text, e_text):
 
 
 def align():
-    global bitext_original, p_e_given_f
-    for (f_text, e_text) in bitext_original:
+    global bitext_stemmed, p_e_given_f
+    for (f_text, e_text) in bitext_stemmed:
         res = align_sent(f_text, e_text)
         sys.stdout.write(" ".join(["-".join([str(i), str(j)]) for (i, j) in res]))
         sys.stdout.write("\n")
@@ -99,7 +106,7 @@ if __name__ == '__main__':
                          type="int", help="Number of sentences to use for training and alignment")
     (opts, _) = optparser.parse_args()
     read_corpus(opts)
-    for i in range(5):
+    for i in range(6):
         EM()
-    sys.stderr.write(sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5])
+    sys.stderr.write(str(sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5]))
     align()
