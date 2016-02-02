@@ -101,5 +101,5 @@ if __name__ == '__main__':
     read_corpus(opts)
     for i in range(5):
         EM()
-    print sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5]
+    sys.stderr.write(sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5])
     align()
