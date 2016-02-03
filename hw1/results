@@ -1,0 +1,14 @@
+Dice
+ Precision = 0.320648
+ Recall = 0.136716
+ AER = 0.807513
+
+Model 1 (10000)
+ Precision = 0.464877
+ Recall = 0.527132
+ AER = 0.507256
+
+Model 1 (full)
+ Precision = 0.563107
+ Recall = 0.640944
+ AER = 0.402050
