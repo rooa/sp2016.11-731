@@ -12,3 +12,8 @@ Model 1 (full)
  Precision = 0.563107
  Recall = 0.640944
  AER = 0.402050
+
+Model 1 + 100-freq pairs
+ Precision = 0.563678
+ Recall = 0.641649
+ AER = 0.401420
