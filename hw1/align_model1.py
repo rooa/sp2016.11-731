@@ -18,12 +18,17 @@ weighted_counts = defaultdict(float)
 deu_stemmer = SnowballStemmer("german", ignore_stopwords=True)
 eng_stemmer = SnowballStemmer("english", ignore_stopwords=True)
 
+supplemental_pair_txt = "data/german_most_freq_translated_pair_500.txt"
+
 
 def read_corpus(opts):
     global bitext_original, bitext_stemmed, bitext_dev, f_count, e_count, fe_count, p_e_given_f
     sys.stderr.write("Training with IBM Model 1...\n")
     bitext_original = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
                        for pair in open(opts.bitext)][:opts.num_sents]
+    supplemental_pairs = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
+                          for pair in open(supplemental_pair_txt)]
+    bitext_original += supplemental_pairs
     bitext_stemmed = [[[deu_stemmer.stem(i) for i in f],
                        [eng_stemmer.stem(i) for i in e]]
                       for (f, e) in bitext_original]
