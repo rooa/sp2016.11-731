@@ -18,7 +18,7 @@ weighted_counts = defaultdict(float)
 deu_stemmer = SnowballStemmer("german", ignore_stopwords=True)
 eng_stemmer = SnowballStemmer("english", ignore_stopwords=True)
 
-supplemental_pair_txt = "data/german_most_freq_translated_pair.txt"
+supplemental_pair_txt = "data/german_most_freq_translated_pair_500.txt"
 
 
 def read_corpus(opts):
