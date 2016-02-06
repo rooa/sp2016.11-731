@@ -37,3 +37,14 @@
 - Precision = 0.533981
 - Recall = 0.613108
 - AER = 0.430599
+
+---
+## Model 1(NULL) 500-freq pairs
+### rept:1
+
+### rept:5
+- Precision = 0.569939
+- Recall = 0.639535
+- AER = 0.398665
+
+### rept:10

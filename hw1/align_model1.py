@@ -18,7 +18,10 @@ weighted_counts = defaultdict(float)
 deu_stemmer = SnowballStemmer("german", ignore_stopwords=True)
 eng_stemmer = SnowballStemmer("english", ignore_stopwords=True)
 
+# Ge -> En
 supplemental_pair_txt = "data/german_most_freq_translated_pair_500.txt"
+# En -> De, then flipped
+supplemental_pair_txt2 = "data/english_most_freq_translated_pair_500.txt"
 
 
 def read_corpus(opts):
@@ -28,8 +31,10 @@ def read_corpus(opts):
                        for pair in open(opts.bitext)][:opts.num_sents]
     supplemental_pairs = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
                           for pair in open(supplemental_pair_txt)]
-    bitext_original += supplemental_pairs
-    bitext_stemmed = [[[deu_stemmer.stem(i) for i in f],
+    supplemental_pairs_2 = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
+                            for pair in open(supplemental_pair_txt2)]
+    bitext_original += (supplemental_pairs + supplemental_pairs_2) * opts.rept_count
+    bitext_stemmed = [[["NULL"] + [deu_stemmer.stem(i) for i in f],
                        [eng_stemmer.stem(i) for i in e]]
                       for (f, e) in bitext_original]
     sys.stderr.write("Stemming finished.\n")
@@ -91,7 +96,8 @@ def align_sent(f_text, e_text):
     res = []
     for (j, e) in enumerate(e_text):
         i = np.argmax([p_e_given_f[f][e] for f in f_text])
-        res.append((i, j))
+        if i > 0:
+            res.append((i - 1, j))
     return res
 
 
@@ -109,6 +115,8 @@ if __name__ == '__main__':
                          help="Parallel corpus (default data/dev-test-train.de-en)")
     optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxint,
                          type="int", help="Number of sentences to use for training and alignment")
+    optparser.add_option("-r", "--repeat_count", dest="rept_count", default=sys.maxint,
+                         type="int", help="Repetion count for most frequent words")
     (opts, _) = optparser.parse_args()
     read_corpus(opts)
     for i in range(6):
