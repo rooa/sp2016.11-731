@@ -45,10 +45,10 @@ def read_corpus(opts):
     sys.stderr.write("Stemming finished.\n")
     bitext_dev = bitext_stemmed
     for (n, (f, e)) in enumerate(bitext_dev):
-        for f_i in set(f):
-            for e_j in set(e):
+        for f_i in f:
+            for e_j in e:
                 fe_count[(f_i, e_j)] += 1
-        for e_j in set(e):
+        for e_j in e:
             e_count[e_j] += 1
         if n % 500 == 0:
             sys.stderr.write(".")
@@ -67,7 +67,8 @@ def expectation_sent(f_text, e_text):
     res = {}
     for (i, e_i) in enumerate(e_text):
         a_i_distribution = [(p_a_given_e * p_e_given_f[f_i][e_i]) for f_i in f_text]
-        p_ai_given_fe = map(lambda x: x / sum(a_i_distribution), a_i_distribution)
+        denom = sum(a_i_distribution)
+        p_ai_given_fe = map(lambda x: x / denom, a_i_distribution)
         res.update({(f_j, e_i): p_ai_given_fe[j] for (j, f_j) in enumerate(f_text)})
     return res
 
