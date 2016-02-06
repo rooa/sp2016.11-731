@@ -10,6 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 bitext_original = None
 bitext_stemmed = None
 bitext_dev = None
+bitext_test = None
 e_count = defaultdict(int)
 fe_count = defaultdict(int)
 p_e_given_f = defaultdict(lambda: defaultdict(float))
@@ -25,10 +26,14 @@ supplemental_pair_txt2 = "data/english_most_freq_translated_pair_500.txt"
 
 
 def read_corpus(opts):
-    global bitext_original, bitext_stemmed, bitext_dev, f_count, e_count, fe_count, p_e_given_f
+    global bitext_original, bitext_stemmed, bitext_dev, bitext_test, e_count, fe_count, p_e_given_f
     sys.stderr.write("Training with IBM Model 1...\n")
     bitext_original = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
                        for pair in open(opts.bitext)][:opts.num_sents]
+    bitext_test = [[["NULL"] + [deu_stemmer.stem(i) for i in f],
+                    [eng_stemmer.stem(i) for i in e]]
+                   for (f, e) in bitext_original]
+
     supplemental_pairs = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
                           for pair in open(supplemental_pair_txt)]
     supplemental_pairs_2 = [[sentence.decode('utf8').strip().split() for sentence in pair.split(' ||| ')]
@@ -102,8 +107,8 @@ def align_sent(f_text, e_text):
 
 
 def align():
-    global bitext_stemmed, p_e_given_f
-    for (f_text, e_text) in bitext_stemmed:
+    global bitext_test, p_e_given_f
+    for (f_text, e_text) in bitext_test:
         res = align_sent(f_text, e_text)
         sys.stdout.write(" ".join(["-".join([str(i), str(j)]) for (i, j) in res]))
         sys.stdout.write("\n")
