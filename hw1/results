@@ -13,27 +13,27 @@
 - Recall = 0.640944
 - AER = 0.402050
 
-## Model 1 + 100-freq pairs (rept:1)
+## Model 1 + 500-freq pairs (rept:1)
 - Precision = 0.563678
 - Recall = 0.641649
 - AER = 0.401420
 
-## Model 1 + 100-freq pairs (rept:10)
+## Model 1 + 500-freq pairs (rept:10)
 - Precision = 0.563678
 - Recall = 0.642354
 - AER = 0.401104
 
-## Model 1 + 100-freq pairs (rept:100)
+## Model 1 + 500-freq pairs (rept:100)
 - Precision = 0.558538
 - Recall = 0.636364
 - AER = 0.406625
 
-## Model 1 + 100-freq pairs (rept:500)
+## Model 1 + 500-freq pairs (rept:500)
 - Precision = 0.551970
 - Recall = 0.630726
 - AER = 0.412776
 
-## Model 1 + 100-freq pairs (rept:1000)
+## Model 1 + 500-freq pairs (rept:1000)
 - Precision = 0.533981
 - Recall = 0.613108
 - AER = 0.430599
