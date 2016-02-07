@@ -3,9 +3,15 @@
 
 import optparse
 import sys
+import cPickle as pickle
 from collections import defaultdict
 import numpy as np
 from nltk.stem.snowball import SnowballStemmer
+
+
+def dd():
+    return defaultdict(float)
+
 
 bitext_original = None
 bitext_stemmed = None
@@ -13,7 +19,7 @@ bitext_dev = None
 bitext_test = None
 e_count = defaultdict(int)
 fe_count = defaultdict(int)
-p_e_given_f = defaultdict(lambda: defaultdict(float))
+p_e_given_f = defaultdict(dd)
 weighted_counts = defaultdict(float)
 
 deu_stemmer = SnowballStemmer("german", ignore_stopwords=True)
@@ -75,7 +81,7 @@ def expectation_sent(f_text, e_text):
 
 def EM():
     global bitext_dev, p_e_given_f
-    weighted_counts = defaultdict(lambda: defaultdict(float))
+    weighted_counts = defaultdict(dd)
     f_vocabularies = set()
     # E-step, calculating weighted scores
     for (f_text, e_text) in bitext_dev:
@@ -129,3 +135,5 @@ if __name__ == '__main__':
         EM()
     sys.stderr.write(str(sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5]))
     align()
+    with open("./p_e_given_f.pickle", "wb") as file_:
+        pickle.dump(p_e_given_f, file_)
