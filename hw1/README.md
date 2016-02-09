@@ -31,3 +31,11 @@ with open("path/to/file", "rb") as f:
 ```
 
 Since the pickled data relies on a particular function, import or define `dd` function first, and load it.
+
+### Model 2
+
+```
+$ python align_model2_pickled.py -r 5 > output.txt
+```
+Same data as with the command with model 1, although make sure that the file 'p_e_given_f.pickle' exists in the same directory as the program.
+This will load the p(e | f) from model 1 result. 
