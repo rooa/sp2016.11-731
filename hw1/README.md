@@ -38,4 +38,5 @@ Since the pickled data relies on a particular function, import or define `dd` fu
 $ python align_model2_pickled.py -r 5 > output.txt
 ```
 Same data as with the command with model 1, although make sure that the file 'p_e_given_f.pickle' exists in the same directory as the program.
-This will load the p(e | f) from model 1 result. 
+This will load the p(e | f) parameters (in the form of a Python default dictionary) from 6 iterations of model 1 result.
+Todo: make an extra option to specify the pickled file of IBM model 1 parameters to load from 
