@@ -129,11 +129,15 @@ if __name__ == '__main__':
                          type="int", help="Number of sentences to use for training and alignment")
     optparser.add_option("-r", "--repeat_count", dest="rept_count", default=sys.maxint,
                          type="int", help="Repetion count for most frequent words")
+    optparser.add_option("-i", "--iteration", dest="iter", default=sys.maxint,
+                         type="int", help="EM iteration")
     (opts, _) = optparser.parse_args()
     read_corpus(opts)
-    for i in range(6):
+    for i in range(opts.iter):
         EM()
+    sys.stderr.write("EM...done.\n")
     sys.stderr.write(str(sorted(p_e_given_f['der'].items(), key=lambda x: x[1], reverse=True)[:5]))
     align()
-    with open("./p_e_given_f.pickle", "wb") as file_:
+    file_name = "./p_dir/p_e_given_f_EM" + str(opts.iter) + ".pickle"
+    with open(file_name, "wb") as file_:
         pickle.dump(p_e_given_f, file_)
