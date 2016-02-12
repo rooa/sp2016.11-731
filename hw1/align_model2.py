@@ -92,7 +92,7 @@ def initialise_params(bias, pret):
         p_e_given_f = pickle.load(f)
     num_keys = 0
     for f in p_e_given_f:
-        num_keys += len(f)
+        num_keys += len(p_e_given_f[f])
     sys.stderr.write("Number of keys for p_e_given_f: " + str(num_keys) + '\n')
     sys.stderr.flush()
         
