@@ -183,11 +183,6 @@ for f in input_sents:
     # on the last stack
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
-    # Post editting
-    translation = extract_phrases(winner)
-
-
-
     print extract_english_recursive(winner)
 
     if opts.verbose:
