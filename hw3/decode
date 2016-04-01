@@ -17,7 +17,7 @@ parser.add_argument('-n', '--num_sentences', dest='num_sents', default=sys.maxin
 parser.add_argument('-l', '--language-model', dest='lm', default='data/lm',
                     help='File containing ARPA-format language model (default=data/lm)')
 parser.add_argument('-v', '--verbose', dest='verbose',
-                    action='store_true', default=False,  help='Verbose mode (default=off)')
+                    action='store_true', default=False, help='Verbose mode (default=off)')
 opts = parser.parse_args()
 
 tm = models.TM(opts.tm, sys.maxint)
