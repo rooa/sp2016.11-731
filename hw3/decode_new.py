@@ -118,16 +118,6 @@ def compute_future_logprob(coverage_vector, span_future_logprob):
     return future_logprob
 
 
-def extract_phrases(h):
-    """ Return a list of phrases (en, es) in the hypothesis Recursive """
-    if not h.predecessor:
-        return []
-    else:
-        ec = extract_phrases(h.predecessor)
-        ec.extend([(h.phrase.english, h.src)])
-        return ec
-
-
 hypothesis = namedtuple('hypothesis', 'logprob, heuristic_logprob, coverage_vector, future_logprob, lm_state, predecessor, phrase')
 
 '''
@@ -193,8 +183,9 @@ for f in input_sents:
     # on the last stack
     winner = max(stacks[-1].itervalues(), key=lambda h: h.logprob)
 
+    # Post editting
     translation = extract_phrases(winner)
-    # TODO
+
 
 
     print extract_english_recursive(winner)
